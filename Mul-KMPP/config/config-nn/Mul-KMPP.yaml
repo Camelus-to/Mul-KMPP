@@ -1,0 +1,219 @@
+dataset: adni
+use_y0_class_weights: False
+use_pn_class_weights: False
+y0_init_power: 0.0
+pn_init_power: 0.0
+model_selection_mode: avg
+rocauc_mode: ovr
+display_ece: True
+extra_optimizer:
+  step: per_batch
+  lr: 0.0001
+  beta1: 0.95
+  beta2: 0.999
+loss_name: CE
+save_attn: False
+save_preds: False
+fdg:
+  mean: 1385.473
+  std: 3435.718
+av45:
+  mean: 24911.911
+  std: 52297.735
+
+# 从这个上面就是config_train.yaml 了
+root:
+  path: /scratch/project_2002147/hoang/data
+  dir_fdg: FDG_PET_CoregAvg
+output_root: outputs
+skip_store: False
+meta_root: ./Metadata
+n_folds: 10
+fold_index: 1
+method_name: climatv2
+backbone_name: shufflenetv2 # x3d_s # resnet18
+model_name: multimodal
+shufflenet_groups: 1
+backbone_checkpoint_path: /home/hoang/.cache/torch/hub/checkpoints
+n_pn_classes: 3
+seq_len: 5
+sample_size: 160
+pretrained_model:
+ssp_start: 0
+n_epochs: 500
+bs: 32
+momentum: 0.9
+bw: 64
+wd: 0
+lr: 1e-5
+num_workers: 0
+grading: DXTARGET
+node: node
+seed: 564047
+log_dir: tb
+comment: grading:DXTARGET_method:DXTARGET_model:${model_name}_site:${site}_fold:${fold_index}_seed:${seed}
+format: ''
+target_col: first_prog_DXTARGET
+train_size_per_class: all
+max_ratio: 0.2
+delta: 0.8
+alpha: 0.5
+# MODEL
+num_cls_num: 1 # ${seq_len}
+width_mult: 2.0
+global_pool_name:
+max_depth: 4
+use_bn: True
+pretrained: imagenet
+drop_rate: 0.2
+drop_rate_between: 0.1
+n_img_features: -1
+n_meta_features: 512
+n_diag_features: ${n_meta_features}
+input_3x3: True
+gp: ....
+# FeaT KL
+predict_current_KL: True
+feat_use: True
+feat_diag_dim: -1
+feat_diag_heads: 4
+feat_diag_depth: 2
+feat_diag_mlp_dim: 512 # This mustn't be smaller than the number of image features
+feat_diag_emb_drop_rate: 0.0
+feat_diag_n_outputs: 1
+# Feat fusion
+feat_fusion_dim: -1
+feat_fusion_heads: 4
+feat_fusion_depth: 4
+feat_fusion_mlp_dim: 512
+feat_fusion_emb_drop_rate: 0.0
+#feat_fusion_n_outputs: 0
+# FeaT prognosis
+feat_dim: -1
+feat_heads: 4
+feat_depth: 2
+feat_mlp_dim: 512 #
+feat_emb_drop_rate: 0.0
+feat_n_outputs: ${seq_len}
+# OPTIMIZER
+clip_norm: -1.0
+beta1: 0.95
+beta2: 0.999
+# LOSS
+focal:
+  gamma: 2.0
+  alpha: 4
+prognosis_coef: 1.0
+diag_coef: 1.0
+cons_coef: 0.5
+img_feature_drop_rate: 0.1
+extract_pr_func: extract_progression_v1
+extract_pn_func: extract_prognosis_v1
+club:
+  s: 1.0
+
+# img_1。。。。。 的、从这里开始，下面就是data中的数据了
+hydra:
+  run:
+     # 任务运行时输出的目录路径
+    # dir: ${output_root}/${now:%Y-%m-%d_%H-%M-%S}_grading:${grading}_FDG_method:${method_name}_model:${model_name}_loss:${loss_name}_fold:${fold_index}_seed:${seed}
+# 文件名的配置
+pkl_meta_filename: cv_split_10folds_${grading}_fdg_${seed}.pkl # cv_split_5folds_${grading}_d1_evalsite_${seed}.pkl
+meta_filename: adni_fdgpet_prognosis.csv # TADPOLE_D1_prog_raw.csv # TADPOLE_D1_prog_br.csv
+n_input_imgs: 1 # 输入图像的数量为 1
+n_channels: 1 # 通道
+parser: # 解析器的配置部分
+  grading: DXTARGET
+  prognosis: prognosis_DXTARGET
+  prognosis_mask: prognosis_mask_DXTARGET
+  progs: progs_DXTARGET
+  progs_mask: progs_mask_DXTARGET
+  input:
+    - fdg
+  metadata:
+    - IMG
+    - AGE
+    - PTGENDER
+    - PTMARRY
+    - PTRACCAT
+    - PTETHCAT
+    - CDRSB
+    - ADAS11
+    - MMSE
+    - RAVLT_immediate
+#    - FDG
+#    - AV45
+    - ABETA
+    - TAU
+    - PTAU
+    - APOE4
+    - RAVLT_learning
+    - RAVLT_forgetting
+    - RAVLT_perc_forgetting
+    - MOCA
+    - ICV
+    - FAQ
+    - PTEDUCAT
+    - Hippocampus
+    - WholeBrain
+    - Entorhinal
+    - Fusiform
+    - MidTemp
+    - EcogPtMem
+    - EcogPtLang
+    - EcogPtVisspat
+    - EcogPtPlan
+    - EcogPtOrgan
+    - EcogPtDivatt
+    - EcogPtTotal
+    - EcogSPMem
+    - EcogSPLang
+    - EcogSPVisspat
+    - EcogSPPlan
+    - EcogSPOrgan
+    - EcogSPDivatt
+    - EcogSPTotal
+    - aal2
+  aal2_data:
+    - Precentral_L
+    - Precentral_R
+    - Frontal_Sup_2_L
+    - Frontal_Sup_2_R
+    - Frontal_Mid_2_L
+    - Frontal_Mid_2_R
+    - Frontal_Inf_Oper_L
+    - Frontal_Inf_Oper_R
+    - Frontal_Inf_Tri_L
+    - Frontal_Inf_Tri_R
+    - Frontal_Inf_Orb_2_L
+    - Frontal_Inf_Orb_2_R
+    - Rolandic_Oper_L
+    - Rolandic_Oper_R
+    - Supp_Motor_Area_L
+    - Supp_Motor_Area_R
+    - Olfactory_L
+    - Olfactory_R
+    - Rectus_L
+    - Rectus_R
+    - Cingulate_Ant_L
+    - Cingulate_Ant_R
+    - Cingulate_Mid_L
+    - Cingulate_Mid_R
+    - Cingulate_Post_L
+    - Cingulate_Post_R
+    - Hippocampus_L
+    - Hippocampus_R
+    - ParaHippocampal_L
+    - ParaHippocampal_R
+    - Amygdala_L
+    - Amygdala_R
+    - Temporal_Sup_L
+    - Temporal_Sup_R
+    - Temporal_Pole_Sup_L
+    - Temporal_Pole_Sup_R
+    - Temporal_Mid_L
+    - Temporal_Mid_R
+    - Temporal_Pole_Mid_L
+    - Temporal_Pole_Mid_R
+    - Temporal_Inf_L
+    - Temporal_Inf_R
