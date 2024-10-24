@@ -41,7 +41,7 @@ task2metrics = {'grading': ['ba', 'ac', 'mauc', 'ba.ka', 'ece', 'eca', 'ada_ece'
 
                 'all': ['loss']}
 
-# 初始化存储模型的字典
+
 save_model = {task: {metric: {'best': float('inf') if 'loss' in metric or 'ece' in metric else -1,
                                 "filename": ""} for metric in task2metrics[task]} for task in task_names}
 
@@ -54,7 +54,7 @@ for task in task_names:
             save_model[task][_name] = {'best': -1, "filename": ""}
 
 
-# 装载这个配置文件
+
 # @hydra.main(config_path="configs/config_train.yaml")
 @hydra.main(config_path="config", config_name="config_train")
 def main(cfg):
@@ -67,7 +67,7 @@ def main(cfg):
     if not os.path.isabs(cfg.meta_root):
         cfg.meta_root = os.path.join(wdir, cfg.meta_root)
         print(f'cfg.meta_root是{cfg.meta_root}')
-    # 检查cfg.node 这个目录是否存在，不存在就创建 cfg.node 的值也是node
+   
     if not os.path.isdir(cfg.node):
         os.makedirs(cfg.node, exist_ok=True)
 
@@ -75,15 +75,12 @@ def main(cfg):
     # print(OmegaConf.to_yaml(cfg))
 
     with open("args.yaml", "w") as f:
-        # 将 Python 对象转换为 YAML 格式的文本 将 OmegaConf 对象 cfg 转换为一个 Python 原生的字典
-        # 将 OmegaConf 对象 cfg 转换为 YAML 格式的文本，并将结果写入名为 "args.yaml" 的文件中
         yaml.dump(OmegaConf.to_container(cfg), f, default_flow_style=False)
 
-    # Load and split data 。data_folds中有十折，每一折是训练集和验证集
+   
     data_folds = loading_data(cfg, img_root='common/adni/data/image_preprocessed', meta_root='common/adni/data/',
                                meta_filename='adni_fdgpet_prognosis.csv',
                                pkl_meta_filename="cv_split_5folds.pkl", seq_len=cfg.seq_len, seed=cfg.seed)
-    # fold_index是1 进行训练集和测试集的划分应该是
     df_train, df_val = data_folds[cfg.fold_index - 1]
 
     print(f'df_train={df_train.describe()}')
@@ -114,10 +111,9 @@ def main(cfg):
         except ValueError:
             log.fatal(f'Failed loading {cfg.pretrained_model}')
     template_s = np.load(
-        r'E:\Technolgy_learning\Learning_code\AD\CLIMATv2-main\model_xiu_all2\common\template\aal90_template_20x24x20.npy')
+        r'E:\Technolgy_learning\Learning_code\AD\common\template\aal90_template_20x24x20.npy')
     template_m = np.load(
-        r'E:\Technolgy_learning\Learning_code\AD\CLIMATv2-main\model_xiu_all2\common\template\aal90_template_40x48x40'
-        r'.npy')
+        r'E:\Technolgy_learning\Learning_code\AD\common\template\aal90_template_40x48x40.npy')
     templates = [template_s, template_m]
     for epoch_i in range(10):
         # TODO: Debug
@@ -141,12 +137,12 @@ def filter_metrics(cfg, metrics):
 
 def model_selection(cfg, filtered_metrics, model, epoch_i):
     global save_model
-    # y0 cfg.node就是要保存的模型和json文件的位置
+    
     if check_y0_exists(cfg):
         save_model = save_model(
             epoch_i, 'grading', "mauc", filtered_metrics, save_model, model, cfg.node, cond="max",
             mode="scalar")
-    # Prognosis 这个值是1
+    
     if cfg.prognosis_coef > 0:
         save_model = save_model(
             epoch_i, 'forecast', "mse", filtered_metrics, save_model, model, cfg.node, cond="min",
@@ -223,7 +219,7 @@ def get_masked_IDs(cfg, batch, mask_name, t=None):
     IDs = batch['data']['input']['ID']
     if "classifier" in cfg.method_name and t is not None:
         t = cfg.target_time - 1
-    # t传过来的是时期，所以肯定不是None;最后返回得是数组，里面是布尔值
+    
     if t is None:
         return [IDs[i] for i in range(len(IDs)) if batch[mask_name][i, 0]]
     else:
