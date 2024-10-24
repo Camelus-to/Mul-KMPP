@@ -216,7 +216,7 @@ RAVLT_COLS = ["RAVLT_immediate", "RAVLT_learning", "RAVLT_forgetting", "RAVLT_pe
 CATEGORICAL_COLS = ['PTMARRY', 'PTRACCAT', 'PTGENDER', 'PTETHCAT']
 
 IMAGING_COLS = ["FDG", "AV45", "Hippocampus", "WholeBrain", "Entorhinal", "Fusiform", "MidTemp",
-                "ICV"]  # 这里就是measure_features
+                "ICV"]  
 
 NUMERICAL_COLS = ["PTEDUCAT", "CDRSB", "ADAS11", "MMSE", "FDG", "AV45", "ABETA",
                   "TAU", "PTAU", "APOE4", "AGE", "MOCA", "FAQ"] + IMAGING_COLS + ECOG_COLS + RAVLT_COLS
@@ -291,7 +291,7 @@ def load_dataset(cfg, meta_root, meta_filename, pkl_meta_filename, seed, seq_len
     # If pickle file doesn't exist, load and preprocess the dataset from the CSV file
     meta_path = os.path.join(meta_root, meta_filename)
     ds = pd.read_csv(
-        r"E:\Technolgy_learning\Learning_code\AD\CLIMATv2-main\model_xiu_all2\common\adni\data\result_test.csv")
+        r"E:\Technolgy_learning\Learning_code\AD\common\adni\data\result_test.csv")
 
     # Replace empty strings with NaN values
     ds.replace(r'^\s*$', np.nan, regex=True, inplace=True)
@@ -578,7 +578,7 @@ def parse_item_progs(root, entry, trf, **kwargs):
 
         prepare_image_input(root, entry, input, kwargs)
 
-    # 处理预后目标
+    
     targets = ["DXTARGET"]
     output = process_prognosis_targets(entry, targets)
 
@@ -591,7 +591,7 @@ def parse_item_progs(root, entry, trf, **kwargs):
     aal2 = torch.from_numpy(entry.iloc[152:-6].to_numpy().astype(np.float32))
     input['aal2'] = aal2
 
-    # 合并输入数据
+   
     input.update(cate_meta)
     input.update(nume_meta)
     input.update(aal2_data)
@@ -605,7 +605,7 @@ def calculate_class_weights(df, cfg):
     # all_stats = None
     all_stats = {'y0': [], 'pn': []}
     max_grade = 2
-    for i in range(1, cfg.seq_len + 1):  # 是1到6
+    for i in range(1, cfg.seq_len + 1): 
         pn_counts = []
         for v in range(0, max_grade + 1):
             count = len(df[df[f'{grading}_{i}'] == v].index)
@@ -644,7 +644,7 @@ def init_transforms():
     train_trf = tio.transforms.Compose((
         tio.transforms.RandomAffine(degrees=(0, 0, 20), translation=20, center='image', default_pad_value='minimum'),
         tio.transforms.RandomElasticDeformation(),
-        tio.transforms.Gamma(0.3),  # 跟这个gamma增强没关系的
+        tio.transforms.Gamma(0.3),  
         tio.transforms.RandomNoise(std=(0, 0.25))
     ))
 
@@ -722,12 +722,12 @@ def calculate_macro_avg_sensitivity(name, y_true, y_pred):
 
 
 def save_model(epoch_i, gradings, metric_names, metrics, stored_models, model, saved_dir, cond="max", mode="avg"):
-    saved_dir = r'E:\Technolgy_learning\Learning_code\AD\CLIMATv2-main\model_xiu_all2\outputs\model'
+    saved_dir = r'E:\Technolgy_learning\outputs\model'
     if isinstance(metric_names, str):
         metric_names = [metric_names]
     if isinstance(gradings, str):
         gradings = [gradings]
-    # saved_dir是snapshots
+    
     metric_values = []
     for name in metric_names:  # mauc,ba
         for grading in gradings:
@@ -781,7 +781,7 @@ def save_model(epoch_i, gradings, metric_names, metrics, stored_models, model, s
                         results[f'{grading}:{metric_name}'] = metrics[grading][metric_name]
 
             # Set the log filename
-            saved_log_fullname = r'E:\Technolgy_learning\Learning_code\AD\CLIMATv2-main\model_xiu_all2\outputs\log.json'
+            saved_log_fullname = r'E:\Technolgy_learning\outputs\log.json'
 
             # Load existing log data if it exists
             try:
