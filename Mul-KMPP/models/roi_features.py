@@ -13,7 +13,6 @@ def get_roi_feature(feature_map_s, feature_map_m, template_s, template_m):
 
     special_ROI = [21, 22, 35, 36, 41, 42, 75, 76, 79, 80]
 
-    # 90 ROIs
     for i in range(1, 91):
 
         if i not in special_ROI:
@@ -91,7 +90,7 @@ class Feature_Extraction(nn.Module):
         self.Conv1 = ConvBlock(1, nChannels)
         self.Conv2 = ConvBlock(nChannels, nChannels * 2)
         self.Conv3 = ConvBlock(nChannels * 2, nChannels * 4)
-        self.Conv4 = ConvBlock(nChannels * 4, nChannels * 8)  # 增加通道数目，是原来得4倍，然后输出的通道是原来的8倍
+        self.Conv4 = ConvBlock(nChannels * 4, nChannels * 8)  
         self.AvgPool = nn.AvgPool3d(kernel_size=2, stride=2)
 
     def forward(self, x):
