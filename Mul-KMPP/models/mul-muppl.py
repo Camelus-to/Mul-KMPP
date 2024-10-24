@@ -284,7 +284,7 @@ class Mul_KMPP(nn.Module):
         self.gamma_pn = np.array([float(cfg.focal.gamma)] * self.seq_len, dtype=float) \
             if "F" in self.cfg.loss_name and self.has_pn() else [None] * self.seq_len
 
-    def configure_crits(self):  # loss_name 是 CE
+    def configure_crits(self): 
         self.crit_pn = create_loss(loss_name=self.cfg.loss_name,
                                    normalized=False,
                                    gamma=self.cfg.focal.gamma,
@@ -378,7 +378,6 @@ class Mul_KMPP(nn.Module):
 
             else:
                 _ft = getattr(self, f"ft_{input_type}")(input[input_type])
-                # 这个操作就是先把形状的列转成了1， 方便对以后来做乘法操作，比如 _ft是（1*521）形状的
                 _ft = input[f'{input_type}_mask'].view(-1, 1) * _ft
                 _ft = torch.unsqueeze(_ft, 1)
                 _ft = self.dropout_between(_ft)
