@@ -1,4 +1,4 @@
-defaults: # 这个defolts就是套娃操作了，接着找下面的文件
+defaults: 
   - config-nn: seq_multi_prog_climatv2
 dataset: adni
 use_y0_class_weights: False
