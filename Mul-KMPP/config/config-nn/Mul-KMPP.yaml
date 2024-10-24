@@ -21,10 +21,8 @@ av45:
   mean: 24911.911
   std: 52297.735
 
-# 从这个上面就是config_train.yaml 了
-root:
-  path: /scratch/project_2002147/hoang/data
-  dir_fdg: FDG_PET_CoregAvg
+
+
 output_root: outputs
 skip_store: False
 meta_root: ./Metadata
@@ -34,7 +32,7 @@ method_name: climatv2
 backbone_name: shufflenetv2 # x3d_s # resnet18
 model_name: multimodal
 shufflenet_groups: 1
-backbone_checkpoint_path: /home/hoang/.cache/torch/hub/checkpoints
+backbone_checkpoint_path: path/
 n_pn_classes: 3
 seq_len: 5
 sample_size: 160
@@ -112,17 +110,16 @@ extract_pn_func: extract_prognosis_v1
 club:
   s: 1.0
 
-# img_1。。。。。 的、从这里开始，下面就是data中的数据了
+
 hydra:
   run:
-     # 任务运行时输出的目录路径
     # dir: ${output_root}/${now:%Y-%m-%d_%H-%M-%S}_grading:${grading}_FDG_method:${method_name}_model:${model_name}_loss:${loss_name}_fold:${fold_index}_seed:${seed}
-# 文件名的配置
+
 pkl_meta_filename: cv_split_10folds_${grading}_fdg_${seed}.pkl # cv_split_5folds_${grading}_d1_evalsite_${seed}.pkl
 meta_filename: adni_fdgpet_prognosis.csv # TADPOLE_D1_prog_raw.csv # TADPOLE_D1_prog_br.csv
-n_input_imgs: 1 # 输入图像的数量为 1
-n_channels: 1 # 通道
-parser: # 解析器的配置部分
+n_input_imgs: 1 
+n_channels: 1
+parser: 
   grading: DXTARGET
   prognosis: prognosis_DXTARGET
   prognosis_mask: prognosis_mask_DXTARGET
